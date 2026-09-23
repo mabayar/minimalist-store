@@ -10,26 +10,30 @@ async function requireAdmin(ctx: MutationCtx) {
     throw new Error("Bu işlem için yönetici yetkisi gerekir.");
 }
 
-/** /admin/ayarlar: sürüm listesi (admin). */
+/** /admin/ayarlar: sürüm listesi (admin değilse boş liste). */
 export const list = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
-    if (userId === null) return null;
+    if (userId === null) return [];
     const user = await ctx.db.get(userId);
-    if (user?.role !== "admin") return null;
+    if (user?.role !== "admin") return [];
 
     const versions = await ctx.db.query("appVersions").collect();
-    return versions
-      .sort((a, b) => b.uploadedAt - a.uploadedAt)
-      .map((v) => ({
-        _id: v._id,
-        version: v.version,
-        fileName: v.fileName,
-        notes: v.notes ?? null,
-        isActive: v.isActive,
-        uploadedAt: v.uploadedAt,
-      }));
+    const rows = await Promise.all(
+      versions
+        .sort((a, b) => b.uploadedAt - a.uploadedAt)
+        .map(async (v) => ({
+          _id: v._id,
+          version: v.version,
+          fileName: v.fileName,
+          notes: v.notes ?? null,
+          isActive: v.isActive,
+          uploadedAt: v.uploadedAt,
+          downloadUrl: await ctx.storage.getUrl(v.storageId),
+        })),
+    );
+    return rows;
   },
 });
 
@@ -51,6 +55,15 @@ export const latest = query({
       uploadedAt: active.uploadedAt,
       downloadUrl: url,
     };
+  },
+});
+
+/** .exe dosyası için kısa ömürlü storage yükleme URL'i üretir (admin). */
+export const generateUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+    return await ctx.storage.generateUploadUrl();
   },
 });
 

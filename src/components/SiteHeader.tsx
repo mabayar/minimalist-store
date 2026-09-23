@@ -13,7 +13,7 @@ const nav = [
 ];
 
 export function SiteHeader() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -40,6 +40,15 @@ export function SiteHeader() {
         <div className="hidden items-center gap-2.5 md:flex">
           {isLoading ? (
             <span className="h-8 w-24 animate-pulse rounded-md bg-muted" />
+          ) : isAuthenticated && user?.role === "admin" ? (
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/admin">Admin</Link>
+              </Button>
+              <Button size="sm" onClick={() => navigate("/panel")}>
+                Panele Git
+              </Button>
+            </>
           ) : isAuthenticated ? (
             <Button size="sm" onClick={() => navigate("/panel")}>
               Panele Git

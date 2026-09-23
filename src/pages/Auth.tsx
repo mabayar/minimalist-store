@@ -18,7 +18,7 @@ import { useAuth } from "@/hooks/use-auth";
 import logo from "@/assets/logo.svg";
 import { ArrowRight, Loader2, Mail, UserX } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 
 interface AuthProps {
   redirectAfterAuth?: string;
@@ -42,6 +42,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     searchParams.get("returnTo"),
     redirectAfterAuth,
   );
+  const isRegisterMode = searchParams.get("mode") === "register";
   const [step, setStep] = useState<"signIn" | { email: string }>("signIn");
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -66,7 +67,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       setError(
         error instanceof Error
           ? error.message
-          : "Failed to send verification code. Please try again.",
+          : "Doğrulama kodu gönderilemedi. Lütfen tekrar deneyin.",
       );
       setIsLoading(false);
     }
@@ -86,7 +87,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     } catch (error) {
       console.error("OTP verification error:", error);
 
-      setError("The verification code you entered is incorrect.");
+      setError("Girdiğiniz doğrulama kodu hatalı.");
       setIsLoading(false);
 
       setOtp("");
@@ -104,7 +105,11 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     } catch (error) {
       console.error("Guest login error:", error);
       console.error("Error details:", JSON.stringify(error, null, 2));
-      setError(`Failed to sign in as guest: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setError(
+        `Misafir girişi başarısız: ${
+          error instanceof Error ? error.message : "Bilinmeyen hata"
+        }`,
+      );
       setIsLoading(false);
     }
   };
@@ -130,9 +135,13 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                       onClick={() => navigate("/")}
                     />
                   </div>
-                <CardTitle className="text-xl">Get Started</CardTitle>
+                <CardTitle className="text-xl">
+                  {isRegisterMode ? "Penconix'e Kaydol" : "Penconix'e Giriş"}
+                </CardTitle>
                 <CardDescription>
-                  Enter your email to log in or sign up
+                  {isRegisterMode
+                    ? "Kaydolmak için e-postanızı girin — yeni hesaplara 1 HWID sıfırlama kredisi tanımlanır."
+                    : "Giriş yapmak veya kaydolmak için e-postanızı girin"}
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleEmailSubmit}>
@@ -174,7 +183,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                       </div>
                       <div className="relative flex justify-center text-xs uppercase">
                         <span className="bg-background px-2 text-muted-foreground">
-                          Or
+                          veya
                         </span>
                       </div>
                     </div>
@@ -187,7 +196,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                       disabled={isLoading}
                     >
                       <UserX className="mr-2 h-4 w-4" />
-                      Continue as Guest
+                      Misafir olarak devam et
                     </Button>
                   </div>
                 </CardContent>
@@ -196,9 +205,9 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
           ) : (
             <>
               <CardHeader className="text-center mt-4">
-                <CardTitle>Check your email</CardTitle>
+                <CardTitle>E-postanızı kontrol edin</CardTitle>
                 <CardDescription>
-                  We've sent a code to {step.email}
+                  {step.email} adresine bir doğrulama kodu gönderdik.
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleOtpSubmit}>
@@ -235,13 +244,13 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                     </p>
                   )}
                   <p className="text-sm text-muted-foreground text-center mt-4">
-                    Didn't receive a code?{" "}
+                    Kod gelmedi mi?{" "}
                     <Button
                       variant="link"
                       className="p-0 h-auto"
                       onClick={() => setStep("signIn")}
                     >
-                      Try again
+                      Tekrar dene
                     </Button>
                   </p>
                 </CardContent>
@@ -254,11 +263,11 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Verifying...
+                        Doğrulanıyor...
                       </>
                     ) : (
                       <>
-                        Verify code
+                        Kodu Doğrula
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </>
                     )}
@@ -270,7 +279,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                     disabled={isLoading}
                     className="w-full"
                   >
-                    Use different email
+                    Farklı e-posta kullan
                   </Button>
                 </CardFooter>
               </form>
@@ -278,15 +287,10 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
           )}
 
           <div className="py-4 px-6 text-xs text-center text-muted-foreground bg-muted border-t rounded-b-lg">
-            Secured by{" "}
-            <a
-              href="https://freebuff.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-primary transition-colors"
-            >
-              freebuff.com
-            </a>
+            <Link to="/" className="underline hover:text-primary transition-colors">
+              penconix.com
+            </Link>{" "}
+            — lisanslarınız güvende
           </div>
         </Card>
         </div>

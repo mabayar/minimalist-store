@@ -1,6 +1,7 @@
 import '@vly-ai/integrations';
 import { Toaster } from "@/components/ui/sonner";
 import { RequireAuth } from "@/components/RequireAuth";
+import { RequireAdmin } from "@/components/RequireAdmin";
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
@@ -12,7 +13,10 @@ import "./index.css";
 // Lazy load route components for better code splitting
 const Landing = lazy(() => import("./pages/Landing.tsx"));
 const AuthPage = lazy(() => import("./pages/Auth.tsx"));
-const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
+const Panel = lazy(() => import("./pages/Panel.tsx"));
+const AdminLicenses = lazy(() => import("./pages/AdminLicenses.tsx"));
+const AdminUsers = lazy(() => import("./pages/AdminUsers.tsx"));
+const AdminSettings = lazy(() => import("./pages/AdminSettings.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 // Simple loading fallback for route transitions
@@ -122,14 +126,38 @@ createRoot(document.getElementById("root")!).render(
               <Route path="/" element={<Landing />} />
               <Route
                 path="/auth"
-                element={<AuthPage redirectAfterAuth="/dashboard" />}
+                element={<AuthPage redirectAfterAuth="/panel" />}
               />
               <Route
-                path="/dashboard"
+                path="/panel"
                 element={
                   <RequireAuth>
-                    <Dashboard />
+                    <Panel />
                   </RequireAuth>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <RequireAdmin>
+                    <AdminLicenses />
+                  </RequireAdmin>
+                }
+              />
+              <Route
+                path="/admin/kullanicilar"
+                element={
+                  <RequireAdmin>
+                    <AdminUsers />
+                  </RequireAdmin>
+                }
+              />
+              <Route
+                path="/admin/ayarlar"
+                element={
+                  <RequireAdmin>
+                    <AdminSettings />
+                  </RequireAdmin>
                 }
               />
               <Route path="*" element={<NotFound />} />
