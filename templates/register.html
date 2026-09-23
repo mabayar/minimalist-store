@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Kaydol{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-head">
+      <span class="brand-mark brand-mark-lg">P</span>
+      <h1>Penconix'e Kaydol</h1>
+      <p>Kaydolan her hesaba <strong>1 HWID sıfırlama kredisi</strong> tanımlanır.</p>
+    </div>
+
+    <form method="post" action="/kayit" class="form">
+      <label class="field">
+        <span>E-posta</span>
+        <input type="email" name="email" placeholder="ad@ornek.com" required autofocus>
+      </label>
+      <label class="field">
+        <span>Şifre</span>
+        <input type="password" name="password" placeholder="En az 6 karakter" required minlength="6">
+      </label>
+      <label class="field">
+        <span>Şifre (tekrar)</span>
+        <input type="password" name="password2" placeholder="Şifrenizi tekrar girin" required>
+      </label>
+      <button type="submit" class="btn btn-primary btn-block">Hesap Oluştur</button>
+    </form>
+
+    <p class="auth-alt">
+      Zaten hesabınız var mı? <a href="/giris">Giriş yapın</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

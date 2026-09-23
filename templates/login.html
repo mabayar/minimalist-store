@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Giriş Yap{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-head">
+      <span class="brand-mark brand-mark-lg">P</span>
+      <h1>Penconix'e Giriş</h1>
+      <p>Giriş yapmak için e-posta ve şifrenizi girin.</p>
+    </div>
+
+    <form method="post" action="/giris" class="form">
+      <label class="field">
+        <span>E-posta</span>
+        <input type="email" name="email" placeholder="ad@ornek.com" required autofocus>
+      </label>
+      <label class="field">
+        <span>Şifre</span>
+        <input type="password" name="password" placeholder="••••••••" required>
+      </label>
+      <button type="submit" class="btn btn-primary btn-block">Giriş Yap</button>
+    </form>
+
+    <p class="auth-alt">
+      Hesabınız yok mu? <a href="/kayit">Kaydolun</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

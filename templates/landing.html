@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Lisans Yönetim Platformu{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container hero-inner">
+    <span class="hero-badge">v1.0 — Penconix Lisans Platformu</span>
+    <h1>Lisanslarınızı <em>tek panelden</em> yönetin</h1>
+    <p class="hero-sub">
+      Penconix lisans sistemi; key üretimi, HWID doğrulama ve sürüm dağıtımını
+      tek çatı altında toplar. Müşterileriniz self-servis panelden kendi
+      lisansını yönetir.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary btn-lg" href="/kayit">Hemen Başla</a>
+      <a class="btn btn-outline btn-lg" href="#paketler">Paketleri Gör</a>
+    </div>
+
+    <div class="hero-card">
+      <div class="hero-card-row">
+        <div class="hero-stat">
+          <span class="hero-stat-icon">🔑</span>
+          <div><small>Lisanslarım</small><strong>3 aktif key</strong></div>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-icon">🔄</span>
+          <div><small>HWID Kredisi</small><strong>1 hak</strong></div>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-icon">⬇️</span>
+          <div><small>Güncel Sürüm</small><strong>{{ latest.version if latest else '—' }}</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ÖZELLİKLER -->
+<section id="ozellikler" class="section">
+  <div class="container">
+    <p class="eyebrow">Özellikler</p>
+    <h2>Sade, güvenli, ölçeklenebilir</h2>
+    <p class="section-sub">Lisans yaşam döngüsünün her adımı tek platformda.</p>
+    <div class="feature-grid">
+      <div class="feature">
+        <div class="feature-icon">🛡️</div>
+        <h3>HWID Kilitli Lisanslar</h3>
+        <p>Her key tek makineye bağlanır; kopya kullanım otomatik engellenir.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔄</div>
+        <h3>Kontrollü HWID Sıfırlama</h3>
+        <p>Müşteri kredisiyle kendi sıfırlamasını yapar, destek yükü azalır.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🖥️</div>
+        <h3>Sürüm Yönetimi</h3>
+        <p>Güncel .exe tek yerden yayınlanır, herkes aynı sürümde kalır.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <h3>Anlık Doğrulama</h3>
+        <p>Client açılışta /api/verify üzerinden saniyeler içinde yanıt alır.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAKETLER -->
+<section id="paketler" class="section section-alt">
+  <div class="container">
+    <p class="eyebrow">Paketler</p>
+    <h2>İhtiyacınıza uygun plan</h2>
+    <p class="section-sub">Tüm paketler self-servis müşteri paneli ve HWID koruması içerir.</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <h3 class="price-tier">VIP</h3>
+        <p class="price"><strong>₺149</strong><span> / ay</span></p>
+        <p class="price-desc">Bireysel kullanıcılar için temel paket.</p>
+        <ul>
+          <li>1 lisans key</li>
+          <li>HWID koruması</li>
+          <li>1 HWID sıfırlama kredisi</li>
+          <li>Sürüm güncellemeleri</li>
+          <li>E-posta desteği</li>
+        </ul>
+        <a class="btn btn-outline btn-block" href="/kayit">VIP Seç</a>
+      </div>
+      <div class="price-card price-card-featured">
+        <span class="price-tag">En Popüler</span>
+        <h3 class="price-tier">VIP+</h3>
+        <p class="price"><strong>₺299</strong><span> / ay</span></p>
+        <p class="price-desc">Profesyoneller ve yoğun kullanım için.</p>
+        <ul>
+          <li>3 lisans key</li>
+          <li>HWID koruması</li>
+          <li>3 HWID sıfırlama kredisi</li>
+          <li>Öncelikli destek</li>
+          <li>Erken sürüm erişimi</li>
+        </ul>
+        <a class="btn btn-primary btn-block" href="/kayit">VIP+ Seç</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- İNDİR -->
+<section id="indir" class="section">
+  <div class="container download-box">
+    <p class="eyebrow">İndir</p>
+    <h2>Güncel sürümü alın</h2>
+    <p class="section-sub">Program Windows işletim sistemi ile uyumludur.</p>
+    {% if latest %}
+      <p class="download-meta"><code>Penconix v{{ latest.version }} — {{ latest.filename }}</code></p>
+      <a class="btn btn-primary btn-lg" href="/download">Windows için İndir</a>
+    {% else %}
+      <p class="muted">Şu anda yayınlanmış bir sürüm yok. Lütfen daha sonra tekrar kontrol edin.</p>
+    {% endif %}
+  </div>
+</section>
+
+<!-- SSS -->
+<section id="sss" class="section section-alt">
+  <div class="container container-narrow">
+    <p class="eyebrow">SSS</p>
+    <h2>Sık sorulan sorular</h2>
+    <div class="faq">
+      <details>
+        <summary>Lisansımı nasıl aktive ederim? <span class="chev">⌄</span></summary>
+        <p>Kayıt olup panele giriş yaptıktan sonra lisans key'inizi "Lisans Ekle" kutusuna yapıştırmanız yeterli.</p>
+      </details>
+      <details>
+        <summary>HWID sıfırlama hakkım biterse ne olur? <span class="chev">⌄</span></summary>
+        <p>Yeni kayıtlarda 1 sıfırlama kredisi tanımlanır. Krediniz bittiğinde yönetici size ek kredi tanımlayabilir.</p>
+      </details>
+      <details>
+        <summary>Bilgisayar değiştirdim, ne yapmalıyım? <span class="chev">⌄</span></summary>
+        <p>Panelden HWID sıfırlama butonunu kullanıp programı yeni bilgisayarda tekrar açmanız yeterli.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

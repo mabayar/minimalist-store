@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Yönetim — Kullanıcılar{% endblock %}
+
+{% block content %}
+<section class="container page">
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Yönetim Paneli</p>
+      <h1>Kullanıcılar</h1>
+    </div>
+  </header>
+
+  <div class="panel-card panel-table">
+    {% if customers %}
+      <table>
+        <thead>
+          <tr>
+            <th>E-posta</th>
+            <th>Lisans Sayısı</th>
+            <th>HWID Kredisi</th>
+            <th>Kayıt Tarihi</th>
+            <th class="th-actions">Kredi Ver</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in customers %}
+            <tr>
+              <td class="cell-email">{{ c.email }}</td>
+              <td><span class="badge badge-secondary">{{ c.license_count }}</span></td>
+              <td>
+                <span class="badge {{ 'badge-success' if c.hwid_reset_credits > 0 else 'badge-danger' }}">
+                  {{ c.hwid_reset_credits }}
+                </span>
+              </td>
+              <td class="muted">{{ c.created_at[:10] }}</td>
+              <td class="td-actions">
+                <form method="post" action="/admin/users/{{ c.id }}/grant-credits" class="form-inline">
+                  <input type="number" name="amount" value="1" class="credit-input" title="Pozitif ekler, negatif düşer">
+                  <button type="submit" class="btn btn-outline btn-sm">Ekle</button>
+                </form>
+                <form method="post" action="/admin/users/{{ c.id }}/grant-credits">
+                  <input type="hidden" name="amount" value="-1">
+                  <button type="submit" class="btn btn-ghost btn-sm" title="1 kredi düş">−1</button>
+                </form>
+                <form method="post" action="/admin/users/{{ c.id }}/grant-credits">
+                  <input type="hidden" name="amount" value="5">
+                  <button type="submit" class="btn btn-ghost btn-sm" title="5 kredi ekle">+5</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty">
+        <span class="empty-icon">👥</span>
+        <p><strong>Henüz müşteri kaydı yok</strong></p>
+        <p class="muted">Müşteriler kayıt olduğunda burada listelenir.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

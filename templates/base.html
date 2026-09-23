@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Penconix{% endblock %} — Penconix</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark">P</span>
+      <span>Penconix</span>
+    </a>
+
+    {% if path.startswith('/admin') %}
+      <nav class="main-nav">
+        <a href="/admin" class="{{ 'active' if path == '/admin' else '' }}">Lisanslar</a>
+        <a href="/admin/kullanicilar" class="{{ 'active' if path == '/admin/kullanicilar' else '' }}">Kullanıcılar</a>
+        <a href="/admin/ayarlar" class="{{ 'active' if path == '/admin/ayarlar' else '' }}">Ayarlar</a>
+      </nav>
+    {% else %}
+      <nav class="main-nav">
+        <a href="/#ozellikler">Özellikler</a>
+        <a href="/#paketler">Paketler</a>
+        <a href="/#indir">İndir</a>
+        <a href="/#sss">SSS</a>
+      </nav>
+    {% endif %}
+
+    <div class="header-actions">
+      {% if path.startswith('/admin') %}
+        <span class="admin-chip">Yönetici</span>
+      {% elif session_user %}
+        <a class="btn btn-ghost btn-sm" href="/panel">Panelim</a>
+        <a class="btn btn-outline btn-sm" href="/cikis">Çıkış</a>
+      {% else %}
+        <a class="btn btn-ghost btn-sm" href="/giris">Giriş Yap</a>
+        <a class="btn btn-primary btn-sm" href="/kayit">Kaydol</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+{% if flash %}
+  <div class="container flash-wrap">
+    <div class="flash flash-{{ flash.type }}">{{ flash.message }}</div>
+  </div>
+{% endif %}
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <span class="brand-mark">P</span> <strong>Penconix</strong>
+    </div>
+    <nav class="footer-nav">
+      <a href="/#ozellikler">Özellikler</a>
+      <a href="/#paketler">Paketler</a>
+      <a href="/#indir">İndir</a>
+      <a href="/giris">Giriş</a>
+      <a href="/panel">Panel</a>
+    </nav>
+    <p class="footer-copy">© 2026 Penconix</p>
+  </div>
+</footer>
+
+</body>
+</html>

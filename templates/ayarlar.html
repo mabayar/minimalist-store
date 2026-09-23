@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Yönetim — Ayarlar{% endblock %}
+
+{% block content %}
+<section class="container page">
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Yönetim Paneli</p>
+      <h1>Ayarlar</h1>
+    </div>
+  </header>
+
+  <!-- Yükleme -->
+  <div class="panel-card">
+    <h2>Yeni Sürüm Yükle</h2>
+    <p class="muted">Yüklenen sürüm otomatik "güncel" olur ve /download ile /api/version güncellenir.</p>
+    <form method="post" action="/admin/ayarlar/upload" enctype="multipart/form-data" class="form upload-form">
+      <label class="field">
+        <span>Sürüm Numarası</span>
+        <input type="text" name="version" placeholder="1.0.1" required>
+      </label>
+      <label class="field">
+        <span>Sürüm Notları (opsiyonel)</span>
+        <input type="text" name="notes" placeholder="Hata düzeltmeleri, iyileştirmeler…">
+      </label>
+      <label class="field">
+        <span>.exe Dosyası</span>
+        <input type="file" name="file" accept=".exe" required>
+      </label>
+      <button type="submit" class="btn btn-primary">Yükle ve Yayınla</button>
+    </form>
+  </div>
+
+  <!-- Sürüm listesi -->
+  <h2 class="list-title">Yayınlanan Sürümler</h2>
+  {% if versions %}
+    <div class="license-list">
+      {% for v in versions %}
+        <div class="license-row">
+          <div class="license-info">
+            <div class="license-key-line">
+              <strong>v{{ v.version }}</strong>
+              {% if v.is_active %}
+                <span class="badge badge-primary">Güncel</span>
+              {% else %}
+                <span class="badge badge-secondary">Arşiv</span>
+              {% endif %}
+            </div>
+            <p class="license-meta">
+              <code>{{ v.filename }}</code>
+              {% if v.notes %} · {{ v.notes }}{% endif %}
+              · {{ v.uploaded_at[:10] }}
+            </p>
+          </div>
+          <div class="row-actions">
+            <a class="btn btn-outline btn-sm" href="/download">⬇ İndir</a>
+            {% if not v.is_active %}
+              <form method="post" action="/admin/versions/{{ v.id }}/activate">
+                <button class="btn btn-outline btn-sm">Güncel Yap</button>
+              </form>
+            {% endif %}
+            <form method="post" action="/admin/versions/{{ v.id }}/delete"
+                  onsubmit="return confirm('Bu sürüm silinsin mi?');">
+              <button class="btn btn-danger btn-sm">Sil</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">
+      <span class="empty-icon">📦</span>
+      <p><strong>Henüz sürüm yayınlanmadı</strong></p>
+      <p class="muted">Yukarıdaki formdan ilk .exe dosyasını yükleyin.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

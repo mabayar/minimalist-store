@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Yönetim — Lisanslar{% endblock %}
+
+{% block content %}
+<section class="container page">
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Yönetim Paneli</p>
+      <h1>Lisanslar</h1>
+    </div>
+    <form method="post" action="/admin/licenses/create" class="form-inline create-form">
+      <select name="tier" class="select">
+        <option value="VIP">VIP</option>
+        <option value="VIP+">VIP+</option>
+      </select>
+      <input type="number" name="days" min="0" value="30" class="days-input" title="Süre (gün, 0 = süresiz)">
+      <button type="submit" class="btn btn-primary">+ Yeni Lisans</button>
+    </form>
+  </header>
+
+  <!-- İstatistikler -->
+  <div class="stat-grid stat-grid-4">
+    <div class="stat-card"><small>Toplam Lisans</small><strong>{{ stats.total }}</strong></div>
+    <div class="stat-card"><small>Aktif</small><strong>{{ stats.active }}</strong></div>
+    <div class="stat-card"><small>Bağlı (Claim)</small><strong>{{ stats.claimed }}</strong></div>
+    <div class="stat-card"><small>Müşteri</small><strong>{{ stats.customers }}</strong></div>
+  </div>
+
+  <!-- Lisans tablosu -->
+  <div class="panel-card panel-table">
+    {% if licenses %}
+      <table>
+        <thead>
+          <tr>
+            <th>Lisans Key</th>
+            <th>Tier</th>
+            <th>Durum</th>
+            <th>Bitiş</th>
+            <th>HWID</th>
+            <th>Sahip</th>
+            <th class="th-actions">İşlem</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for l in licenses %}
+            <tr>
+              <td><code class="license-key">{{ l.license_key }}</code></td>
+              <td><span class="badge {{ 'badge-primary' if l.tier == 'VIP+' else 'badge-secondary' }}">{{ l.tier }}</span></td>
+              <td>
+                {% if l.is_active %}
+                  <span class="badge badge-success">Aktif</span>
+                {% else %}
+                  <span class="badge badge-danger">Pasif</span>
+                {% endif %}
+              </td>
+              <td class="muted">{{ l.expire_date[:10] if l.expire_date else 'Süresiz' }}</td>
+              <td class="muted"><code>{{ l.hwid or '—' }}</code></td>
+              <td class="muted">{{ l.owner_email or '—' }}</td>
+              <td class="td-actions">
+                <form method="post" action="/admin/licenses/{{ l.id }}/reset-hwid">
+                  <button class="btn btn-icon" title="HWID sıfırla" {% if not l.hwid %}disabled{% endif %}>🔄</button>
+                </form>
+                <form method="post" action="/admin/licenses/{{ l.id }}/toggle">
+                  <button class="btn btn-icon" title="{{ 'Pasifleştir' if l.is_active else 'Aktifleştir' }}">⏻</button>
+                </form>
+                <form method="post" action="/admin/licenses/{{ l.id }}/delete"
+                      onsubmit="return confirm('Bu lisans silinsin mi?');">
+                  <button class="btn btn-icon btn-danger" title="Sil">🗑</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty">
+        <span class="empty-icon">🔑</span>
+        <p><strong>Henüz lisans yok</strong></p>
+        <p class="muted">Sağ üstten ilk lisansınızı üretin.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

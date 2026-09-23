@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Müşteri Paneli{% endblock %}
+
+{% block content %}
+<section class="container page">
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Müşteri Paneli</p>
+      <h1>Hoş geldin, {{ user.email }}</h1>
+    </div>
+    <div class="page-head-actions">
+      {% if latest and latest.filename %}
+        <a class="btn btn-outline" href="/download">⬇ Güncel Sürümü İndir</a>
+      {% endif %}
+      <a class="btn btn-ghost" href="/cikis">Çıkış Yap</a>
+    </div>
+  </header>
+
+  <!-- Özet kartları -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <small>Lisanslarım</small>
+      <strong>{{ licenses|length }}</strong>
+    </div>
+    <div class="stat-card">
+      <small>HWID Sıfırlama Kredisi</small>
+      <strong>{{ user.hwid_reset_credits }}</strong>
+      <p class="stat-note">
+        {% if user.hwid_reset_credits > 0 %}
+          Her sıfırlama 1 kredi harcar.
+        {% else %}
+          Sıfırlama hakkınız bitti, yöneticinizle iletişime geçin.
+        {% endif %}
+      </p>
+    </div>
+    <div class="stat-card">
+      <small>Güncel Sürüm</small>
+      <strong>{{ latest.version if latest else '—' }}</strong>
+      {% if latest %}
+        <p class="stat-note">{{ latest.filename }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Lisans ekleme -->
+  <div class="panel-card">
+    <h2>Lisans Ekle</h2>
+    <p class="muted">Elinizdeki lisans key'ini buraya girerek hesabınıza bağlayın.</p>
+    <form method="post" action="/panel/claim" class="form form-inline">
+      <input type="text" name="license_key" placeholder="PNX-XXXXX-XXXXX-XXXXX"
+             class="mono uppercase" required>
+      <button type="submit" class="btn btn-primary">Aktifleştir</button>
+    </form>
+  </div>
+
+  <!-- Lisans listesi -->
+  <h2 class="list-title">Lisanslarım</h2>
+  {% if licenses %}
+    <div class="license-list">
+      {% for l in licenses %}
+        <div class="license-row">
+          <div class="license-info">
+            <div class="license-key-line">
+              <code class="license-key">{{ l.license_key }}</code>
+              <span class="badge {{ 'badge-primary' if l.tier == 'VIP+' else 'badge-secondary' }}">{{ l.tier }}</span>
+              {% if not l.is_active %}
+                <span class="badge badge-danger">Pasif</span>
+              {% elif l.expire_date %}
+                <span class="badge badge-danger">Süresi Bitti</span>
+              {% else %}
+                <span class="badge badge-success">Aktif</span>
+              {% endif %}
+            </div>
+            <p class="license-meta">
+              Bitiş: {{ l.expire_date[:10] if l.expire_date else 'Süresiz' }}
+              · HWID: <code>{{ l.hwid or '—' }}</code>
+            </p>
+          </div>
+          <form method="post" action="/panel/reset-hwid/{{ l.id }}">
+            <button type="submit" class="btn btn-outline btn-sm"
+                    {% if user.hwid_reset_credits <= 0 or not l.hwid %}disabled{% endif %}
+                    title="{% if user.hwid_reset_credits <= 0 %}Sıfırlama hakkınız bitti{% endif %}">
+              🔄 HWID Sıfırla
+            </button>
+          </form>
+        </div>
+      {% endfor %}
+      {% if user.hwid_reset_credits <= 0 %}
+        <div class="alert alert-error">
+          Sıfırlama hakkınız bitti, yöneticinizle iletişime geçin.
+        </div>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="empty">
+      <span class="empty-icon">🔑</span>
+      <p><strong>Henüz lisansınız yok</strong></p>
+      <p class="muted">Yukarıdaki kutuya lisans key'inizi girerek başlayın.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
