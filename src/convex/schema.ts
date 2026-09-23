@@ -16,6 +16,9 @@ export const roleValidator = v.union(
 );
 export type Role = Infer<typeof roleValidator>;
 
+export const tierValidator = v.union(v.literal("VIP"), v.literal("VIP+"));
+export type Tier = Infer<typeof tierValidator>;
+
 const schema = defineSchema(
   {
     // default auth tables using convex auth.
@@ -32,12 +35,37 @@ const schema = defineSchema(
       role: v.optional(roleValidator), // role of the user. do not remove
     }).index("email", ["email"]), // index for the email. do not remove or modify
 
-    // add other tables here
+    // Lisans tablosu: admin tarafından üretilir, müşteri /panel üzerinden
+    // kendi hesabına bağlar (userId). Client .exe /api/verify ile sorgular.
+    licenses: defineTable({
+      licenseKey: v.string(),
+      hwid: v.optional(v.string()),
+      tier: tierValidator,
+      expireDate: v.optional(v.number()), // ms timestamp; tanımsızsa süresiz
+      isActive: v.boolean(),
+      userId: v.optional(v.id("users")), // lisansın bağlı olduğu müşteri
+      createdAt: v.number(),
+    })
+      .index("by_license_key", ["licenseKey"])
+      .index("by_user", ["userId"]),
 
-    // tableName: defineTable({
-    //   ...
-    //   // table fields
-    // }).index("by_field", ["field"])
+    // Müşteri profili: auth kullanıcısı + HWID sıfırlama kredisi.
+    customers: defineTable({
+      userId: v.id("users"),
+      email: v.optional(v.string()),
+      hwidResetCredits: v.number(), // yeni kayıtta varsayılan 1
+      createdAt: v.number(),
+    }).index("by_user_id", ["userId"]),
+
+    // .exe sürüm yönetimi: admin /admin/ayarlar üzerinden yükler.
+    appVersions: defineTable({
+      version: v.string(),
+      fileName: v.string(),
+      storageId: v.id("_storage"),
+      notes: v.optional(v.string()),
+      isActive: v.boolean(),
+      uploadedAt: v.number(),
+    }).index("by_active", ["isActive"]),
   },
   {
     schemaValidation: false,
